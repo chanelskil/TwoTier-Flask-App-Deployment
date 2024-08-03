@@ -1,0 +1,4 @@
+Flask==latest
+flask-mysqldb==latest
+gunicorn==latest
+
