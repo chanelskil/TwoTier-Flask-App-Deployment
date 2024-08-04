@@ -2,11 +2,7 @@ pipeline {
     agent any
     environment {
         ANSIBLE_HOST_KEY_CHECKING = 'False'
-    }
-    tools {
-        python3
-        python3-venv
-    }
+
     stages {
         stage('Fetch Code') {
             steps {
