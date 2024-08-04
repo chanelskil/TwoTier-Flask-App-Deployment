@@ -20,6 +20,7 @@ pipeline {
                     sh '''
                         ansible-playbook -i ansible/hosts ansible/deploy.yml --private-key=$SSH_KEY
                     '''
+                }
             }
         }
     }
