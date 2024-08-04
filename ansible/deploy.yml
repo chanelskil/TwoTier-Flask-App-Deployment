@@ -35,12 +35,12 @@
     
     - name: Install Python dependencies
       pip:
-        requirements: "{{apppath}}"/"{{appname}}"/requirements.txt
-        virtualenv: "{{apppath}}"/"{{appname}}"/venv
+        requirements: "{{apppath}}/{{appname}}"/requirements.txt
+        virtualenv: "{{apppath}}/{{appname}}"/venv
 
     - name: verify the installation of dependecies
       shell: | 
-        . "{{apppath}}"/"{{appname}}"/venv/bin/activate
+        . "{{apppath}}/{{appname}}"/venv/bin/activate
         pip check
       register: pip_check_output
 
