@@ -22,10 +22,11 @@
         - python3-pip
         - python3-venv
 
-    - name: copy app-file from control to client
-      synchronize: 
-        src: "{{jenkinspath}}/{{appname}}/" 
-        dest: "{{apppath}}/{{appname}}/"
+    - name: Clone the Flask app repository
+      git:
+        repo: 'https://github.com/chanelskil/TwoTier-Flask-App-Deployment.git'
+        dest: "{{ apppath }}/{{ appname }}"
+        version: master
       
     - name: Create a Python virtual environment
       shell: python3 -m venv "{{apppath}}/{{appname}}"

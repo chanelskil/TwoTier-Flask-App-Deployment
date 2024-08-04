@@ -16,12 +16,10 @@ pipeline {
         }
         stage('Deploy - Ansible Playbook') {
             steps {
-                sshagent(['clientapp-key-ec2']) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'clientapp-key-ec2', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    ansible-playbook -i "ubuntu@172.31.60.148" /ansible/deploy.yml
+                        ansible-playbook -i ansible/hosts ansible/deploy.yml --private-key=$SSH_KEY
                     '''
-                }
-                ansiblePlaybook(credentialsId: 'client-key', playbook: 'deploy.yml', inventory: 'hosts.ini')
             }
         }
     }
