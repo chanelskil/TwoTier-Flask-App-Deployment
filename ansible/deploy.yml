@@ -53,9 +53,3 @@
         python "{{ apppath }}/{{ appname }}/app.py"
       args:
         chdir: "{{ apppath }}/{{ appname }}"
-        
-
-
-
-        
-
