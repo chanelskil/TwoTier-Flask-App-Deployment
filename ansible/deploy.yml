@@ -1,0 +1,61 @@
+---
+- name: app servers
+  hosts: client-apps
+  become: yes
+  vars: 
+    jenkinspath: /var/lib/jenkins/workspace
+    apppath: /var/www
+    appname: TwoTierApp_FlaskPy
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        name: update instace
+        update_cache: yes
+
+    - name: install needed packages for flask
+      apt:
+      name: "{{items}}"
+      state: present
+      loop:
+        - python3
+        - python3-pip
+        - python3-venv
+
+    - name: copy app-file from control to client
+      synchronize: 
+        src: "{{jenkinspath}}/{{appname}}/" 
+        dest: "{{apppath}}/{{appname}}/"
+      
+    - name: Create a Python virtual environment
+      shell: python3 -m venv "{{apppath}}/{{appname}}"
+      args:
+        creates: "{{apppath}}/{{appname}}/venv/bin/activate}}"
+    
+    - name: Install Python dependencies
+      pip:
+        requirements: "{{apppath}}"/"{{appname}}"/requirements.txt
+        virtualenv: "{{apppath}}"/"{{appname}}"/venv
+
+    - name: verify the installation of dependecies
+      shell: | 
+        . "{{apppath}}"/"{{appname}}"/venv/bin/activate
+        pip check
+      register: pip_check_output
+
+    - name: Display pip check result
+      debug:
+        msg: "{{ pip_check_output.stdout }}"
+
+    - name: Start the Flask app
+      shell: |
+        . "{{ apppath }}/{{ appname }}/venv/bin/activate"
+        python "{{ apppath }}/{{ appname }}/app.py"
+      args:
+        chdir: "{{ apppath }}/{{ appname }}"
+        
+
+
+
+        
+

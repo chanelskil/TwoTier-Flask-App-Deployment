@@ -1,9 +1,16 @@
 pipeline {
     agent any
+    environment {
+        ANSIBLE_HOST_KEY_CHECKING = 'False'
+    }
+    tools {
+        python3
+        python3-venv
+    }
     stages {
-        stage('SCM') {
+        stage('Fetch Code') {
             steps {
-                git 'https://github.com/chanelskil/TwoTier-Flask-App-Deployment.git'
+                git branch: 'master', url:'https://github.com/chanelskil/TwoTier-Flask-App-Deployment.git'
             }
         }
         stage('Build and Test') {
@@ -11,9 +18,14 @@ pipeline {
                 sh 'echo "Run build and tests"'
             }
         }
-        stage('Deploy') {
+        stage('Deploy - Ansible Playbook') {
             steps {
-                ansiblePlaybook(credentialsId: 'AWS_SSH', playbook: 'deploy.yml', inventory: 'hosts.ini')
+                sshagent(['clientapp-key-ec2']) {
+                    sh '''
+                    ansible-playbook -i "ubuntu@172.31.60.148," /path/to/your/deploy_flask_app.yml
+                    '''
+                }
+                ansiblePlaybook(credentialsId: 'client-key', playbook: 'deploy.yml', inventory: 'hosts.ini')
             }
         }
     }
