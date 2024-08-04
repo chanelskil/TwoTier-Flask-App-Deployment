@@ -18,6 +18,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'clientapp-key-ec2', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
+                        export PATH=$PATH:/usr/bin
                         ansible-playbook -i ansible/hosts ansible/deploy.yml
                     '''
                 }
