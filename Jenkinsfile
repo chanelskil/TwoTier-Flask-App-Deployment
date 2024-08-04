@@ -18,7 +18,7 @@ pipeline {
             steps {
                 sshagent(['clientapp-key-ec2']) {
                     sh '''
-                    ansible-playbook -i "ubuntu@172.31.60.148," /path/to/your/deploy_flask_app.yml
+                    ansible-playbook -i "ubuntu@172.31.60.148" /ansible/deploy.yml
                     '''
                 }
                 ansiblePlaybook(credentialsId: 'client-key', playbook: 'deploy.yml', inventory: 'hosts.ini')
