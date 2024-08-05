@@ -21,6 +21,7 @@
         - python3
         - python3-pip
         - python3-venv
+        - pkg-config
 
     - name: Clone the Flask app repository
       git:
