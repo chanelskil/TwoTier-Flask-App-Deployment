@@ -155,7 +155,7 @@
     - name: Start the Flask app using gunicorn
       shell: |
         . "{{ apppath }}/{{ appname }}/venv/bin/activate"
-        gunicorn --workers 3 --bind 0.0.0.0:5000 "{{ appname }}:app"
+        gunicorn --workers 3 --bind 0.0.0.0:5000 "app:app"
       args:
         chdir: "{{ apppath }}/{{ appname }}"
 
