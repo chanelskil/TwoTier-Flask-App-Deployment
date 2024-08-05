@@ -67,7 +67,25 @@
     - name: Display installed packages
       debug:
         msg: "{{ pip_list.stdout }}"
+
+    - name: Check MySQL service status
+      systemd:
+        name: mysql
+        state: started
+      register: mysql_status
    
+    - name: Ensure MySQL is running
+      systemd:
+        name: mysql
+        state: started
+        enabled: yes  # Ensures the service starts on boot
+      when: mysql_status.status.ActiveState != "active"
+    
+    - name: Report MySQL status
+      debug:
+        msg: "MySQL service is running and enabled."
+      when: mysql_status.changed == false
+      
     - name: Create MySQL user
       community.mysql.mysql_user:
         name: "{{ mysql_user }}"
@@ -78,7 +96,6 @@
         login_unix_socket: /run/mysqld/mysqld.sock
       vars:
         ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
-
 
     - name: Ensure the messages table exists
       ansible.builtin.mysql_query:
@@ -116,6 +133,7 @@
         path: /etc/environment
         line: "{{ item.key }}={{ item.value }}"
         create: yes
+
       loop:
         - { key: "FLASKAPP_MYSQL_HOST", value: "{{mysql_host}}" }
         - { key: "FLASKAPP_MYSQL_USER", value: "{{mysql_user}}" }
