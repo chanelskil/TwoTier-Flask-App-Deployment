@@ -4,15 +4,29 @@ pipeline {
         ANSIBLE_HOST_KEY_CHECKING = 'False'
     }
     stages {
+        stage('Setup') {
+            steps {
+                script {
+                    // Check if last_commit.txt exists, if not, create it with a dummy commit hash
+                    if (!fileExists('last_commit.txt')) {
+                        writeFile file: 'last_commit.txt', text: 'dummy-hash'
+                    }
+                }
+            }
+        }
         stage('Fetch Code') {
             steps {
                 git branch: 'master', url: 'https://github.com/chanelskil/TwoTier-Flask-App-Deployment.git'
+                script {
+                    // Update last_commit.txt with the latest commit hash
+                    def latestCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                    writeFile file: 'last_commit.txt', text: "${latestCommit}"
+                }
             }
         }
         stage('Build and Test') {
             steps {
                 echo "Running build and tests"
-                // Add actual test and build commands here
             }
         }
         stage('Pre-Deployment Check') {
