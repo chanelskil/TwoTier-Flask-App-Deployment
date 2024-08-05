@@ -98,6 +98,14 @@
       vars:
         ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
+    - name: Create MySQL database
+      community.mysql.mysql_db:
+        name: "{{ mysql_db }}"
+        state: present
+        login_user: "{{ mysql_user }}"
+        login_password: "{{ mysql_user_password }}"
+        login_host: "{{ mysql_host }}"
+
     - name: Ensure the messages table exists
       ansible.builtin.mysql_query:
         login_db: "{{ mysql_db }}"
