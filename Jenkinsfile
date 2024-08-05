@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     env.DEPLOY_NEEDED = 'true'
-                    def responseCode = sh script: "curl -s -o /dev/null -w '%{http_code}' http://172.31.60.148:5000/", returnStdout: true
+                    def responseCode = sh script: "curl -s -o /dev/null -w '%{http_code}' http://3.95.32.136:5000/", returnStdout: true
                     if (responseCode == '200') {
                         echo 'Health check passed. Checking for updates...'
                         def currentCommit = sh script: "git rev-parse HEAD", returnStdout: true
