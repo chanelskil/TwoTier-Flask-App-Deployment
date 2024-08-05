@@ -150,7 +150,10 @@
         - { key: "FLASKAPP_MYSQL_USER", value: "{{mysql_user}}" }
         - { key: "FLASKAPP_MYSQL_PASSWORD", value: "{{mysql_user_password}}" }
         - { key: "FLASKAPP_MYSQL_DB", value: "{{mysql_db}}" }
-      no_log: false  # Ensures sensitive information isn't logged
+      no_log: true  # Ensures sensitive information isn't logged
+
+    - name: Ensure port 5000 is free
+      shell: fuser -k 5000/tcp
 
     - name: Start the Flask app using gunicorn
       shell: |
@@ -158,4 +161,6 @@
         gunicorn --workers 3 --bind 0.0.0.0:5000 "app:app"
       args:
         chdir: "{{ apppath }}/{{ appname }}"
+      register: gunicorn_start
+      failed_when: "'error' in gunicorn_start.stderr.lower()"
 
