@@ -1,4 +1,4 @@
-Flask==latest
-flask-mysqldb==latest
-gunicorn==latest
+Flask
+flask-mysqldb
+gunicorn
 
