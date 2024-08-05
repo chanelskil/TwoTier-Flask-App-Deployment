@@ -3,3 +3,4 @@ flask-mysqldb
 gunicorn
 mysqlclient
 pymysql
+cryptography
