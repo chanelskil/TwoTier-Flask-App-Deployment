@@ -6,6 +6,13 @@
     jenkinspath: /var/lib/jenkins/workspace
     apppath: /var/www
     appname: TwoTierApp_FlaskPy
+    mysql_root_username: 'root'
+    mysql_root_password: ''  # Use Ansible vault to encrypt this
+    mysql_user: 'nelson'
+    mysql_user_password: 'nelson123'  # Use Ansible vault to encrypt this
+    mysql_host: 'clientappshost'  # '%' allows connection from any host; specify IP or hostname for restricted access
+    mysql_db: messages
+
 
   tasks:
     - name: Update and upgrade apt packages
@@ -51,10 +58,57 @@
     - name: Display pip check result
       debug:
         msg: "{{ pip_check_output.stdout }}"
+   
+    - name: Create MySQL user
+      community.mysql.mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_user_password }}"
+        host: "{{ mysql_host }}"
+        priv: "{{ mysql_db }}.*:ALL"
+        state: present
 
-    - name: Start the Flask app
+
+    - name: Ensure the messages table exists
+      ansible.builtin.mysql_query:
+        login_db: "{{ mysql_db }}"
+        login_user: "{{ mysql_user }}"
+        login_password: "{{ mysql_user_password }}"
+        query: |
+          CREATE TABLE IF NOT EXISTS messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            message TEXT
+          );
+
+    - name: Connect to mysql db
+      community.mysql.mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_user_password }}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+
+    - name: Insert data into the table
+      ansible.builtin.mysql_query:
+        login_db: "{{ mysql_db }}"
+        login_user: "{{mysql_user}}"
+        login_password: "{{ mysql_user_password }}"
+        query: |
+          INSERT INTO messages (message) VALUES ( 'This is a sample message');
+
+    - name: Set environment variables for Flask app
+      ansible.builtin.lineinfile:
+        path: /etc/environment
+        line: "{{ item.key }}={{ item.value }}"
+        create: yes
+      loop:
+        - { key: "FLASKAPP_MYSQL_HOST", value: "{{mysql_host}}" }
+        - { key: "FLASKAPP_MYSQL_USER", value: "{{mysql_user}}" }
+        - { key: "FLASKAPP_MYSQL_PASSWORD", value: "{{mysql_password}}" }
+        - { key: "FLASKAPP_MYSQL_DB", value: "{{mysql_db}}" }
+      no_log: true  # Ensures sensitive information isn't logged
+
+    - name: Start the Flask app using gunicorn
       shell: |
         . "{{ apppath }}/{{ appname }}/venv/bin/activate"
-        python "{{ apppath }}/{{ appname }}/app.py"
+        gunicorn --workers 3 --bind 0.0.0.0:5000 "{{ appname }}:app"
       args:
         chdir: "{{ apppath }}/{{ appname }}"
+
