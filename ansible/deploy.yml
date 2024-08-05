@@ -59,6 +59,14 @@
     - name: Display pip check result
       debug:
         msg: "{{ pip_check_output.stdout }}"
+
+    - name: List installed packages in the virtual environment
+      shell: "{{ apppath }}/{{ appname }}/venv/bin/pip list"
+      register: pip_list
+
+    - name: Display installed packages
+      debug:
+        msg: "{{ pip_list.stdout }}"
    
     - name: Create MySQL user
       community.mysql.mysql_user:
