@@ -56,8 +56,5 @@ pipeline {
         failure {
             echo 'Build failed!'
         }
-        always {
-            // Additional cleanup or notifications can be added here.
-        }
     }
 }
