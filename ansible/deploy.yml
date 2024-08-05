@@ -75,6 +75,8 @@
         host: "{{ mysql_host }}"
         priv: "{{ mysql_db }}.*:ALL"
         state: present
+      vars:
+    ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
 
     - name: Ensure the messages table exists
@@ -87,12 +89,16 @@
             id INT AUTO_INCREMENT PRIMARY KEY,
             message TEXT
           );
+      vars:
+    ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
     - name: Connect to mysql db
       community.mysql.mysql_user:
         name: "{{ mysql_user }}"
         password: "{{ mysql_user_password }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
+      vars:
+    ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
     - name: Insert data into the table
       ansible.builtin.mysql_query:
@@ -101,6 +107,8 @@
         login_password: "{{ mysql_user_password }}"
         query: |
           INSERT INTO messages (message) VALUES ( 'This is a sample message');
+      vars:
+    ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
     - name: Set environment variables for Flask app
       ansible.builtin.lineinfile:
