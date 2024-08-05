@@ -7,7 +7,7 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    // Check if last_commit.txt exists, if not, create it with a dummy commit hash
+                    // Ensure the last_commit.txt exists to compare commits.
                     if (!fileExists('last_commit.txt')) {
                         writeFile file: 'last_commit.txt', text: 'dummy-hash'
                     }
@@ -18,7 +18,7 @@ pipeline {
             steps {
                 git branch: 'master', url: 'https://github.com/chanelskil/TwoTier-Flask-App-Deployment.git'
                 script {
-                    // Update last_commit.txt with the latest commit hash
+                    // Update last_commit.txt with the current commit hash.
                     def latestCommit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
                     writeFile file: 'last_commit.txt', text: "${latestCommit}"
                 }
@@ -27,6 +27,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 echo "Running build and tests"
+                // Add actual build and test commands here.
             }
         }
         stage('Pre-Deployment Check') {
@@ -40,11 +41,15 @@ pipeline {
                         def lastDeployedCommit = readFile('last_commit.txt').trim()
                         if (currentCommit == lastDeployedCommit) {
                             env.DEPLOY_NEEDED = 'false'
+                            echo 'No updates to deploy. Exiting build...'
                             currentBuild.result = 'SUCCESS'
-                            echo 'No updates to deploy.'
+                            // Use error to stop the pipeline gracefully.
+                            error('No deployment needed. Latest code already deployed.')
                         }
                     } else {
                         echo 'Health check failed or application is not responding as expected.'
+                        currentBuild.result = 'FAILURE'
+                        error('Health check failed.')
                     }
                 }
             }
@@ -64,11 +69,18 @@ pipeline {
         }
     }
     post {
+        always {
+            echo 'Cleaning up...'
+            // Add cleanup steps if necessary.
+        }
         success {
             echo 'Build was successful!'
         }
         failure {
             echo 'Build failed!'
+        }
+        aborted {
+            echo 'Build was aborted!'
         }
     }
 }
