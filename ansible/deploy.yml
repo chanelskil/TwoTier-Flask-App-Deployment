@@ -105,6 +105,8 @@
         login_user: "{{ mysql_user }}"
         login_password: "{{ mysql_user_password }}"
         login_host: "{{ mysql_host }}"
+      vars:
+        ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
     - name: Ensure the messages table exists
       ansible.builtin.mysql_query:
