@@ -11,15 +11,15 @@ pipeline {
         }
         stage('Build and Test') {
             steps {
-                sh 'echo "Run build and tests"'
-                // Here, you'd run actual build and test commands
+                echo "Running build and tests"
+                // Add actual test and build commands here
             }
         }
         stage('Pre-Deployment Check') {
             steps {
                 script {
                     env.DEPLOY_NEEDED = 'true'
-                    def responseCode = sh script: "curl -s -o /dev/null -w '%{http_code}' http://172.31.60.148:5000/", returnStdout: true
+                    def responseCode = sh script: "curl -s -o /dev/null -w '%{http_code}' http://172.31.60.148:5000/health", returnStdout: true
                     if (responseCode == '200') {
                         echo 'Health check passed. Checking for updates...'
                         def currentCommit = sh script: "git rev-parse HEAD", returnStdout: true
@@ -29,6 +29,8 @@ pipeline {
                             currentBuild.result = 'SUCCESS'
                             echo 'No updates to deploy.'
                         }
+                    } else {
+                        echo 'Health check failed or application is not responding as expected.'
                     }
                 }
             }
@@ -53,6 +55,9 @@ pipeline {
         }
         failure {
             echo 'Build failed!'
+        }
+        always {
+            // Additional cleanup or notifications can be added here.
         }
     }
 }
