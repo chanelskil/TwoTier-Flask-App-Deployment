@@ -148,7 +148,7 @@
       loop:
         - { key: "FLASKAPP_MYSQL_HOST", value: "{{mysql_host}}" }
         - { key: "FLASKAPP_MYSQL_USER", value: "{{mysql_user}}" }
-        - { key: "FLASKAPP_MYSQL_PASSWORD", value: "{{mysql_password}}" }
+        - { key: "FLASKAPP_MYSQL_PASSWORD", value: "{{mysql_user_password}}" }
         - { key: "FLASKAPP_MYSQL_DB", value: "{{mysql_db}}" }
       no_log: false  # Ensures sensitive information isn't logged
 
