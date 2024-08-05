@@ -33,6 +33,7 @@
         - build-essential
         - libmysqlclient-dev
         - python3-dev
+        - mysql-server
 
     - name: Clone the Flask app repository
       git:
@@ -85,7 +86,7 @@
       debug:
         msg: "MySQL service is running and enabled."
       when: mysql_status.changed == false
-      
+
     - name: Create MySQL user
       community.mysql.mysql_user:
         name: "{{ mysql_user }}"
