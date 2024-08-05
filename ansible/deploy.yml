@@ -75,6 +75,7 @@
         host: "{{ mysql_host }}"
         priv: "{{ mysql_db }}.*:ALL"
         state: present
+        login_unix_socket: /run/mysqld/mysqld.sock
       vars:
         ansible_python_interpreter: "{{ apppath }}/{{ appname }}/venv/bin/python"
 
